@@ -7,6 +7,7 @@ import fr.esiea.ex4A.services.AgifyService;
 import fr.esiea.ex4A.services.MeetService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -44,10 +45,7 @@ public class MeetController {
                         this.agifyService.getAgeByNameAndCountry(
                                 user.getUsername(), user.getCountry()));
         this.service.addUser(user);
-        if (this.service.getAllUsers().contains(user)) {
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(user, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/matches", produces = "application/json")
@@ -57,11 +55,8 @@ public class MeetController {
         List<Match> matches = new ArrayList<>();
         User u = this.service.getUserByNameAndCountry(username, country);
         if (u != null) {
-            for (User v : this.service.getAllUsers()) {
-                if (!v.getUsername().equals(u.getUsername())
-                        && Math.abs(u.getAge() - v.getAge()) <= 4
-                        && u.getSexPref() == v.getSex()
-                        && v.getSexPref() == u.getSex()) {
+            for (User v : this.service.getAllUsers().stream().filter(x-> !x.getUsername().equals(username) && !x.getCountry().equals(country)).collect(Collectors.toList())) {
+                if (this.service.match(u, v)) {
                     matches.add(new Match(v));
                 }
             }

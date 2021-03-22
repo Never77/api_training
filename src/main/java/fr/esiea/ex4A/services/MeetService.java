@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
+
 @Service
 public class MeetService {
 
@@ -26,6 +28,10 @@ public class MeetService {
 
     public User getUserByNameAndCountry(String username, String country) {
         return this.repository.getUserByNameAndCountry(username, country);
+    }
+
+    public Boolean match(@NotNull User u, @NotNull User v) {
+        return Math.abs(u.getAge() - v.getAge()) <= 4 && u.getSex() == v.getSexPref() && v.getSex() == u.getSexPref();
     }
 
     public void removeUser(User u) {
