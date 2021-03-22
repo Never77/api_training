@@ -3,7 +3,9 @@ package fr.esiea.ex4A.controllers;
 
 import fr.esiea.ex4A.models.Match;
 import fr.esiea.ex4A.models.User;
+import fr.esiea.ex4A.services.AgifyService;
 import fr.esiea.ex4A.services.MeetService;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -19,8 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class MeetController {
 
     @Autowired private final MeetService service;
+    @Autowired private final AgifyService agifyService;
 
-    public MeetController(MeetService service) { this.service = service; }
+    public MeetController(MeetService service, AgifyService agifyService) {
+        this.service = service;
+        this.agifyService = agifyService;
+    }
 
     @GetMapping(path = "/users", produces = "application/json")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -32,6 +38,11 @@ public class MeetController {
             produces = "application/json",
             consumes = "application/json")
     public ResponseEntity<?> signUp(@Valid @RequestBody User user) {
+        user =
+                new User(
+                        user,
+                        this.agifyService.getAgeByNameAndCountry(
+                                user.getUsername(), user.getCountry()));
         this.service.addUser(user);
         if (this.service.getAllUsers().contains(user)) {
             return new ResponseEntity<>(user, HttpStatus.CREATED);
@@ -43,6 +54,18 @@ public class MeetController {
     public ResponseEntity<?> getMatches(
             @NotNull @NotBlank @RequestParam(value = "userName") String username,
             @NotNull @NotBlank @RequestParam(value = "userCountry") String country) {
-        return new ResponseEntity<>(new Match("jacklin", "@yourSweetHeart45"), HttpStatus.OK);
+        List<Match> matches = new ArrayList<>();
+        User u = this.service.getUserByNameAndCountry(username, country);
+        if (u != null) {
+            for (User v : this.service.getAllUsers()) {
+                if (!v.getUsername().equals(u.getUsername())
+                        && Math.abs(u.getAge() - v.getAge()) <= 4
+                        && u.getSexPref() == v.getSex()
+                        && v.getSexPref() == u.getSex()) {
+                    matches.add(new Match(v));
+                }
+            }
+        }
+        return new ResponseEntity<>(matches, HttpStatus.OK);
     }
 }

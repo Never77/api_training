@@ -23,4 +23,12 @@ public class MeetService {
     public void addUser(User user) {
         this.repository.addUser(user);
     }
+
+    public User getUserByNameAndCountry(String username, String country) {
+        return this.repository.getUserByNameAndCountry(username, country);
+    }
+
+    public void removeUser(User u) {
+        this.repository.removeUser(u);
+    }
 }
