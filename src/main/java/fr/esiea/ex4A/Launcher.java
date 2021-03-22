@@ -1,10 +1,12 @@
+/* (Copyrights Hector GODZIEN) 2021 */
 package fr.esiea.ex4A;
 
+import fr.esiea.ex4A.clients.AgifyClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 @SpringBootApplication
 public class Launcher {
@@ -15,9 +17,11 @@ public class Launcher {
 
     @Bean
     AgifyClient agifyClient() {
-        Retrofit retrofit = Retrofit.Builder()
-            .baseUrl("https://api.agify.io")
-            .build();
+        Retrofit retrofit =
+                new Retrofit.Builder()
+                        .baseUrl("https://api.agify.io")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
 
         return retrofit.create(AgifyClient.class);
     }
