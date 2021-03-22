@@ -17,7 +17,7 @@ public class User {
     private final Sex sex;
     private final Sex sexPref;
 
-    @JsonIgnore private final Optional<Integer> age;
+    @JsonIgnore private final Integer age;
 
     @Pattern(regexp = "^[A-Z]{2}$")
     private final String country;
@@ -38,10 +38,10 @@ public class User {
         this.sex = Sex.valueOf(sex);
         this.sexPref = Sex.valueOf(sexPref);
         this.country = country;
-        this.age = Optional.empty();
+        this.age = null;
     }
     public User(@NotNull @NotBlank User user, @NotNull @NotBlank Integer age) {
-        this.age = Optional.of(age);
+        this.age = age;
         this.username = user.username;
         this.email = user.email;
         this.twitter = user.twitter;
@@ -54,6 +54,6 @@ public class User {
     public String getTwitter() { return twitter; }
     public Sex getSex() { return sex; }
     public Sex getSexPref() { return sexPref; }
-    public Optional<Integer> getAge() { return age; }
+    public Integer getAge() { return age; }
     public String getCountry() { return country; }
 }
